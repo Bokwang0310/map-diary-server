@@ -1,37 +1,24 @@
 import express from "express";
 import cors from "cors";
+import { readMarker, writeMarker } from "./db.js";
 
-const app = express();
 const port = 3000;
-
-const data = [
-  {
-    id: 1,
-    title: "운동장",
-    coords: { lat: 34.8278067421632, lng: 128.7029347333332 },
-    diary: "세포세포지세포에 간다. 간다 간다 나는 간다.",
-    authorId: "1q2w3e",
-  },
-  {
-    id: 2,
-    title: "일운반점",
-    coords: { lat: 34.82875760278186, lng: 128.70274008706005 },
-    diary: "일운반점에 가면 고양이가 누워 자고 있지만 시간도 없고 그냥 간다.",
-    authorId: "qwerqwer",
-  },
-  {
-    id: 3,
-    title: "계룡산 숯불갈비",
-    coords: { lat: 34.82890836462485, lng: 128.7045881621918 },
-    diary: "계룡산 숯불갈비에서는 갈비를 판다. 고기이다. 고기",
-    authorId: "asdfasdf",
-  },
-];
+const app = express();
 
 app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-app.get("/", (_, res) => {
-  res.json(data);
+app.get("/", async (_, res) => {
+  const markers = await readMarker();
+  res.json(markers);
+});
+
+app.post("/", async (req, res) => {
+  console.log(req.body);
+  await writeMarker(req.body);
+  const markers = await readMarker();
+  res.json(markers);
 });
 
 app.listen(port, () => console.log(`Server is running on localhost:${port}`));
